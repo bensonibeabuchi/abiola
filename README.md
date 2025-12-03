@@ -132,15 +132,15 @@ Below is a high-level overview of the migration architecture from **Vercel** to 
 
 ```mermaid
 flowchart TD
-    A[Vercel Next.js App] -->|Uses DATABASE_URL| B[Vercel Postgres Database]
-    C[Azure DevOps Repo] --> D[Azure DevOps CI/CD Pipelines]
-    D -->|Build & Deploy| E[Azure App Service (Linux Web App)]
+    A["Vercel Next.js App"] -->|Uses DATABASE_URL| B["Vercel Postgres Database"]
+    C["Azure DevOps Repo"] --> D["Azure DevOps CI/CD Pipelines"]
+    D -->|Build & Deploy| E["Azure App Service - Linux Web App"]
     E -->|Reads/Writes| B
-    F[Terraform Infra (infra/)] -->|Provision| G[Resource Group & VNet]
+    F["Terraform Infra (infra/)"] -->|Provision| G["Resource Group & VNet"]
     G --> E
-    F --> H[Key Vault]
+    F --> H["Key Vault"]
     H -->|Inject DATABASE_URL & Secrets| E
-    E --> I[Application Insights]
+    E --> I["Application Insights"]
 
 ```
 
