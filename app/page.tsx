@@ -1,65 +1,83 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+
+export default function PostsPage() {
+  const [posts, setPosts] = useState([]);
+  const [title, setTitle] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Fetch posts
+  async function loadPosts() {
+    const res = await fetch("/api/posts");
+    const data = await res.json();
+    setPosts(data);
+  }
+
+  // Load posts on page load
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
+  // Create new post
+  async function createPost(e: React.FormEvent) {
+    e.preventDefault();
+    if (!title.trim()) return;
+
+    setLoading(true);
+
+    await fetch("/api/posts", {
+      method: "POST",
+      body: JSON.stringify({ title }),
+    });
+
+    setTitle("");
+    setLoading(false);
+
+    loadPosts(); // refresh list
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="max-w-xl mx-auto py-12 ">
+      <p className="text-3xl font-bold mb-6 text-center">Welcome to Abiola&apos;s Devops Project.</p>
+      <h1 className="text-lg font-medium mb-6 text-center">You can add posts, and read posts on this mini social media log</h1>
+
+      {/* Create post form */}
+      <form onSubmit={createPost} className="flex gap-3 mb-8">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="New post title..."
+          className="flex-1 border px-3 py-2 rounded"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <button
+          type="submit"
+          disabled={loading}
+          className="px-4 py-2 bg-black dark:invert text-white rounded"
+        >
+          {loading ? "Adding..." : "Add"}
+        </button>
+      </form>
+
+      {/* Posts list */}
+      <ul className="space-y-4">
+        {posts.map((post: any) => (
+          <li
+            key={post.id}
+            className="border p-4 rounded bg-black dark:invert shadow-sm"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+            <p className="text-gray-600 font-medium">{post.title}</p>
+            <p className="text-gray-500 text-sm">
+              {new Date(post.createdAt).toLocaleString()}
+            </p>
+          </li>
+        ))}
+
+        {posts.length === 0 && (
+          <p className="text-gray-500">No posts yet.</p>
+        )}
+      </ul>
     </div>
   );
 }
