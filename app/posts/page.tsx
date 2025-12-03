@@ -53,7 +53,7 @@ export default function PostsPage() {
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 bg-black text-white rounded"
+          className="px-4 py-2 bg-gray-500 text-white rounded"
         >
           {loading ? "Adding..." : "Add"}
         </button>
@@ -66,7 +66,7 @@ export default function PostsPage() {
             key={post.id}
             className="border p-4 rounded bg-white shadow-sm"
           >
-            <p className="font-medium">{post.title}</p>
+            <p className="text-gray-600 font-medium">{post.title}</p>
             <p className="text-gray-500 text-sm">
               {new Date(post.createdAt).toLocaleString()}
             </p>
